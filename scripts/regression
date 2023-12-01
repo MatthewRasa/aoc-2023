@@ -1,0 +1,35 @@
+#!/bin/bash
+cd "$(dirname "$0")/.."
+
+declare -i passed=0
+declare -i skipped=0
+declare -i total=0
+for day_bin in build/bin/*; do
+	day="$(basename "$day_bin")"
+	solution_file="solutions/$day.txt"
+	if [[ -f "$solution_file" ]]; then
+		solutions=([1]="$(sed '/^$/,$d' "$solution_file")" [2]="$(sed '0,/^$/d' "$solution_file")")
+	else
+		solutions=([1]='' [2]='')
+	fi
+
+	echo -n "Day $day: "
+	for part in 1 2; do
+		if [[ -z "${solutions[part]}" ]]; then
+			((++skipped))
+			echo -ne "\e[1;37mS\e[0m"
+		elif [[ "$(./"$day_bin" "$part" < input/"${day}.txt")" == "${solutions[part]}" ]]; then
+			((++passed))
+			((++total))
+			echo -ne "\e[1;32mP\e[0m"
+		else
+			((++total))
+			echo -ne "\e[1;31mF\e[0m"
+		fi
+	done
+	echo
+done
+
+[[ "$passed" -eq "$total" ]] && i=32 || i=31
+echo -e "\e[1;${i}mPassed $passed/$total\e[0m ($skipped skipped)"
+[[ "$passed" -eq "$total" ]]

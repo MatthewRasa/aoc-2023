@@ -1,0 +1,19 @@
+#!/bin/bash
+
+declare build_type=Release
+if [[ "$#" -ne 0 ]]; then
+	case "$1" in
+		debug|Debug|DEBUG) build_type=Debug ;;
+		*)
+			echo "Usage: $0 [debug]" >&2
+			exit 1
+	esac
+fi
+
+cd "$(dirname "$0")/.."
+
+mkdir -p build
+cd build
+
+cmake -G Ninja -DCMAKE_BUILD_TYPE="$build_type" ..
+cmake --build .

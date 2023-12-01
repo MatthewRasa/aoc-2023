@@ -1,0 +1,5 @@
+file(GLOB sources "*.cc")
+foreach(source ${sources})
+	get_filename_component(target "${source}" NAME_WE)
+	add_executable("${target}" "${source}")
+endforeach()
