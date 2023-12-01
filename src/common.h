@@ -123,6 +123,20 @@ private:
 	std::size_t line_num_{0};
 };
 
+/* --- Numeric Conversions --- */
+
+[[nodiscard]] bool is_digit(char c) noexcept {
+	return '0' <= c && c <= '9';
+}
+
+/* --- Algorithm Functors --- */
+
+struct Is_Digit {
+	[[nodiscard]] bool operator()(char c) const noexcept {
+		return is_digit(c);
+	}
+};
+
 /* --- Position --- */
 
 struct Position {
