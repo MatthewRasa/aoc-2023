@@ -29,12 +29,19 @@ std::vector<std::string> read_lines(std::istream &in) {
 	return lines;
 }
 
-std::vector<std::string> read_tokens(const std::string &line, char delim = ' ') {
-	std::vector<std::string> tokens;
-	std::stringstream ss{line};
-	for (std::string token; std::getline(ss, token, delim); )
-		tokens.push_back(token);
+template<typename Transform_FuncT = std::function<std::string(std::string &&)>>
+auto read_tokens(std::istream &in, char delim = ' ', const Transform_FuncT &transform_func = [](std::string &&token) { return std::move(token); }) {
+	using Token_Type = std::decay_t<std::invoke_result_t<decltype(transform_func), std::string &&>>;
+	std::vector<Token_Type> tokens;
+	for (std::string token; std::getline(in, token, delim); )
+		tokens.push_back(transform_func(std::move(token)));
 	return tokens;
+}
+
+template<typename Transform_FuncT = std::function<std::string(std::string &&)>>
+auto read_tokens(const std::string &in, char delim = ' ', const Transform_FuncT &transform_func = [](std::string &&token) { return std::move(token); }) {
+	std::stringstream ss{in};
+	return read_tokens(ss, delim, transform_func);
 }
 
 template<typename Transform_FuncT = std::function<char(char)>>
@@ -68,6 +75,11 @@ struct Token_Reader {
 		return instance;
 	}
 
+	static CRTP create_from_string(const std::string &in) {
+		std::stringstream ss{in};
+		return create_from_stream(ss);
+	}
+
 	virtual ~Token_Reader() = default;
 
 	virtual void read_token(const std::string &token) = 0;
@@ -94,6 +106,11 @@ struct Line_Reader {
 		return instance;
 	}
 
+	static CRTP create_from_string(const std::string &in) {
+		std::stringstream ss{in};
+		return create_from_stream(ss);
+	}
+
 	virtual ~Line_Reader() = default;
 
 	virtual void read_line(const std::string &line) = 0;
@@ -107,6 +124,11 @@ struct Paragraph_Reader {
 			instance.read_line(line);
 		instance.read_end();
 		return instance;
+	}
+
+	static CRTP create_from_string(const std::string &in) {
+		std::stringstream ss{in};
+		return create_from_stream(ss);
 	}
 
 	virtual ~Paragraph_Reader() = default;
