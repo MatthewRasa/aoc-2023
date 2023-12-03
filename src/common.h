@@ -147,8 +147,34 @@ private:
 
 /* --- Numeric Conversions --- */
 
-[[nodiscard]] bool is_digit(char c) noexcept {
+[[nodiscard]] constexpr bool is_digit(char c) noexcept {
 	return '0' <= c && c <= '9';
+}
+
+[[nodiscard]] constexpr bool is_symbol(char c) noexcept {
+	switch (c) {
+		case '#':
+		case '%':
+		case '&':
+		case '*':
+		case '+':
+		case '-':
+		case '/':
+		case '=':
+		case '@':
+		case '$':
+			return true;
+		default:
+			return false;
+	}
+}
+
+template<typename IntegralT> requires std::is_integral_v<IntegralT>
+[[nodiscard]] constexpr std::size_t count_digits(IntegralT number) {
+	std::size_t digits{1};
+	for (; number > IntegralT{9}; number /= IntegralT{10})
+		++digits;
+	return digits;
 }
 
 /* --- Algorithm Functors --- */
