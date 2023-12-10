@@ -60,6 +60,14 @@ std::vector<std::vector<int>> read_integer_grid(std::istream &in) {
 	return read_grid(in, [](char c) { return c - '0'; });
 }
 
+template<typename ReaderT>
+std::vector<ReaderT> read_as(std::istream &in) {
+	std::vector<ReaderT> readers;
+	while (has_input(in))
+		readers.push_back(ReaderT::create_from_stream(in));
+	return readers;
+}
+
 template<class CRTP, char DelimV = ' '>
 struct Token_Reader {
 	static CRTP create_from_stream(std::istream &in) {
