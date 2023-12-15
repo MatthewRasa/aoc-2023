@@ -49,8 +49,9 @@ auto read_grid(std::istream &in, const Transform_FuncT &transform_func = [](char
 	using Element_Type = std::decay_t<std::invoke_result_t<decltype(transform_func), char>>;
 	std::vector<std::vector<Element_Type>> grid;
 	for (std::string line; std::getline(in, line) && !line.empty(); ) {
-		std::vector<Element_Type> grid_line(line.size());
-		std::transform(line.begin(), line.end(), grid_line.begin(), transform_func);
+		std::vector<Element_Type> grid_line;
+		grid_line.reserve(line.size());
+		std::transform(line.begin(), line.end(), std::back_inserter(grid_line), transform_func);
 		grid.push_back(std::move(grid_line));
 	}
 	return grid;
