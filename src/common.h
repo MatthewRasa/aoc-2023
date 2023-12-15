@@ -194,6 +194,22 @@ struct Is_Digit {
 	}
 };
 
+/* --- Algorithms --- */
+
+template<typename IterT, typename FuncT>
+void foreach_combination(IterT begin, IterT end, const FuncT &func) {
+	for (auto i = begin; i != end; ++i) {
+		for (auto j = std::next(i); j != end; ++j) {
+			func(*i, *j);
+		}
+	}
+}
+
+template<typename RangeT, typename FuncT>
+void ranges_foreach_combination(RangeT &&range, const FuncT &func) {
+	foreach_combination(std::begin(range), std::end(range), func);
+}
+
 /* --- Position --- */
 
 struct Position {
