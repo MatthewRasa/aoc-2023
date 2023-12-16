@@ -231,6 +231,18 @@ struct Grid_Position {
 	[[nodiscard]] bool operator==(const Grid_Position &other) const noexcept {
 		return r == other.r && c == other.c;
 	}
+	[[nodiscard]] Grid_Position move_up() const noexcept {
+		return Grid_Position{r - 1, c};
+	}
+	[[nodiscard]] Grid_Position move_left() const noexcept {
+		return Grid_Position{r, c - 1};
+	}
+	[[nodiscard]] Grid_Position move_down() const noexcept {
+		return Grid_Position{r + 1, c};
+	}
+	[[nodiscard]] Grid_Position move_right() const noexcept {
+		return Grid_Position{r, c + 1};
+	}
 };
 
 namespace std {
