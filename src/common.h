@@ -226,10 +226,60 @@ struct Position3D {
 	}
 };
 
+struct Grid_Direction {
+	enum { UP = 0, LEFT = 1, DOWN = 2, RIGHT = 3 };
+
+	Grid_Direction(int val) noexcept
+			: val_{val} { }
+
+	[[nodiscard]] operator int() const noexcept {
+		return val_;
+	}
+
+	[[nodiscard]] Grid_Direction turn_counter_clockwise() const noexcept {
+		return (val_ + 1) % 4;
+	}
+
+	[[nodiscard]] Grid_Direction reverse() const noexcept {
+		return (val_ + 2) % 4;
+	}
+
+	[[nodiscard]] Grid_Direction turn_clockwise() const noexcept {
+		return (val_ + 3) % 4;
+	}
+private:
+	int val_;
+};
+
 struct Grid_Position {
 	std::size_t r, c;
 	[[nodiscard]] bool operator==(const Grid_Position &other) const noexcept {
 		return r == other.r && c == other.c;
+	}
+	[[nodiscard]] bool can_move_up() const noexcept {
+		return r > 0;
+	}
+	[[nodiscard]] bool can_move_left() const noexcept {
+		return c > 0;
+	}
+	[[nodiscard]] bool can_move_down(std::size_t num_rows) const noexcept {
+		return r < num_rows - 1;
+	}
+	[[nodiscard]] bool can_move_right(std::size_t num_columns) const noexcept {
+		return c < num_columns - 1;
+	}
+	[[nodiscard]] bool can_move(Grid_Direction direction, std::size_t num_rows, std::size_t num_columns) const noexcept {
+		switch (direction) {
+		case Grid_Direction::UP:
+			return can_move_up();
+		case Grid_Direction::LEFT:
+			return can_move_left();
+		case Grid_Direction::DOWN:
+			return can_move_down(num_rows);
+		case Grid_Direction::RIGHT:
+		default:
+			return can_move_right(num_columns);
+		}
 	}
 	[[nodiscard]] Grid_Position move_up() const noexcept {
 		return Grid_Position{r - 1, c};
@@ -242,6 +292,19 @@ struct Grid_Position {
 	}
 	[[nodiscard]] Grid_Position move_right() const noexcept {
 		return Grid_Position{r, c + 1};
+	}
+	[[nodiscard]] Grid_Position move(Grid_Direction direction) const noexcept {
+		switch (direction) {
+		case Grid_Direction::UP:
+			return move_up();
+		case Grid_Direction::LEFT:
+			return move_left();
+		case Grid_Direction::DOWN:
+			return move_down();
+		case Grid_Direction::RIGHT:
+		default:
+			return move_right();
+		}
 	}
 };
 
@@ -257,6 +320,13 @@ namespace std {
 	struct hash<Position3D> {
 		[[nodiscard]] std::size_t operator()(const Position3D &position) const noexcept {
 			return std::hash<std::string>{}(std::to_string(position.x) + "," + std::to_string(position.y) + "," + std::to_string(position.z));
+		}
+	};
+
+	template<>
+	struct hash<Grid_Direction> {
+		[[nodiscard]] std::size_t operator()(const Grid_Direction &direction) const noexcept {
+			return direction;
 		}
 	};
 
